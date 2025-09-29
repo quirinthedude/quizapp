@@ -7,14 +7,68 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import './style.css';
 import { QUIZ } from './data/quiz.js';
-console.log('Rubriken:', QUIZ.map(r => r.rubric));
-console.log('Fragen HTML:', QUIZ.find(r => r.rubric==='HTML')?.questions.length);
+// console.log('Rubriken:', QUIZ.map(r => r.rubric));
+// console.log('Fragen HTML:', QUIZ.find(r => r.rubric==='HTML')?.questions.length);
+
+console.info('Using script:', import.meta.url);
+if (!import.meta.url.includes('/src/main.js')) {
+  console.warn('⚠️ Du editierst offenbar nicht /src/main.js');
+}
+
+// const html = QUIZ.find(r => r.rubric === 'HTML');
+// const first = html.questions[0];
+let currentDifficulty = "hard";
+let currentRubric = "HTML";
+let currentQuestionNumber = 1;
+const currentQuest =
+  (QUIZ.find(r => r.rubric === currentRubric)?.questions || [])
+    .filter(q => q.difficulty === currentDifficulty)
+    .slice(0, 10)
+    .map(q => ({
+      question:     q.text,
+      answer_1:     q.choices[0],
+      answer_2:     q.choices[1],
+      answer_3:     q.choices[2],
+      answer_4:     q.choices[3],
+      right_answer: q.correctIndex + 1, // 0-basiert → 1-basiert
+      answered:     true
+    }));
+
+function init() {
+
+    renderQuestion();
+    renderAnswers();
+    renderQuestionNumber();
+    renderDifficulty();
+}
+
+function renderQuestionNumber() {
+    const questionNumber = document.getElementById('question-number');
+    questionNumber.textContent = `Frage: ${currentQuestionNumber}/${currentQuest.length}`;
+}
+
+function renderDifficulty() {
+    const level = document.getElementById('level');
+    level.textContent = `Schwierigkeitsgrad : ${currentDifficulty}`
+}
+
+function renderQuestion() {
+    const quizQuestion = document.getElementById('quiz-question');
+    quizQuestion.textContent = `Frage: ${currentQuest[currentQuestionNumber].question}`;
+}
+
+function renderAnswers() {
+    const answer1 = document.getElementById('answer_1');
+    const answer2 = document.getElementById('answer_2');
+    const answer3 = document.getElementById('answer_3');
+    const answer4 = document.getElementById('answer_4');
+    answer1.textContent = `${currentQuest[currentQuestionNumber].answer_1}`;
+    answer2.textContent = `${currentQuest[currentQuestionNumber].answer_2}`;
+    answer3.textContent = `${currentQuest[currentQuestionNumber].answer_3}`;
+    answer4.textContent = `${currentQuest[currentQuestionNumber].answer_4}`;
 
 
-const html = QUIZ.find(r => r.rubric === 'HTML');
-const first = html.questions[0];
-
-
+}
 // einbinden von rubric: html
 ////////////////////////////////////////////////////////////////////////////////////
 // document.querySelector('.quiz-question').textContent = first.text;
@@ -30,7 +84,7 @@ const first = html.questions[0];
 
 // kleiner Funktionstest, dass JS läuft:
 console.log('main.js geladen');
-
+init();
 // Beispiel: erste Frage einsetzen
 // const questionEl = document.querySelector('.quiz-question');
 // const answersEl  = document.querySelector('.quiz-answers');
