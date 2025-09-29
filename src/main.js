@@ -1,101 +1,169 @@
-// src/main.js (oder main.js – je nach Pfad in deiner index.html)
+// src/main.js
 
-// 1) Bootstrap einbinden (Vite importiert aus node_modules)
+// ———————————————————————————————————————————————————————————————
+// Imports (Vite): Bootstrap + Icons + eigenes CSS + Daten
+// ———————————————————————————————————————————————————————————————
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import './style.css';
 import { QUIZ } from './data/quiz.js';
-// console.log('Rubriken:', QUIZ.map(r => r.rubric));
-// console.log('Fragen HTML:', QUIZ.find(r => r.rubric==='HTML')?.questions.length);
 
 console.info('Using script:', import.meta.url);
-if (!import.meta.url.includes('/src/main.js')) {
-  console.warn('⚠️ Du editierst offenbar nicht /src/main.js');
-}
 
-// const html = QUIZ.find(r => r.rubric === 'HTML');
-// const first = html.questions[0];
-let currentDifficulty = "hard";
-let currentRubric = "HTML";
-let currentQuestionNumber = 1;
+// ———————————————————————————————————————————————————————————————
+// Zustand (State)
+// ———————————————————————————————————————————————————————————————
+let currentDifficulty = 'hard';   //  'easy' | 'medium' | 'hard' 
+let currentRubric     = 'HTML';   // 'HTML' | 'CSS' | 'JS' | 'JSON'
+let currentIndex      = 0;        // 0-basiert!
+
+// Fragen-Pool aufbereiten (max. 10)
 const currentQuest =
   (QUIZ.find(r => r.rubric === currentRubric)?.questions || [])
     .filter(q => q.difficulty === currentDifficulty)
     .slice(0, 10)
     .map(q => ({
       question:     q.text,
-      answer_1:     q.choices[0],
-      answer_2:     q.choices[1],
-      answer_3:     q.choices[2],
-      answer_4:     q.choices[3],
-      right_answer: q.correctIndex + 1, // 0-basiert → 1-basiert
-      answered:     true
+      answer_1:     q.choices?.[0] ?? '',
+      answer_2:     q.choices?.[1] ?? '',
+      answer_3:     q.choices?.[2] ?? '',
+      answer_4:     q.choices?.[3] ?? '',
+      right_answer: (q.correctIndex ?? 0) + 1,
+      answered:     false,
     }));
 
-function init() {
+// Debug in der Konsole nutzbar machen (weil ES-Module nicht global sind)
+window.__Q = { currentQuest, get index(){return currentIndex;} };
 
-    renderQuestion();
-    renderAnswers();
-    renderQuestionNumber();
-    renderDifficulty();
-}
+// ———————————————————————————————————————————————————————————————
+// DOM-Helpers
+// ———————————————————————————————————————————————————————————————
+const $id = (id) => document.getElementById(id);
 
+// Fragelement: erlaubt id ODER class 
+const getQuestionEl = () =>
+  $id('quiz-question') || document.querySelector('.quiz-question');
+
+// ———————————————————————————————————————————————————————————————
+// Render-Funktionen (defensiv, crasht nicht bei HMR-Zwischenzuständen)
+// ———————————————————————————————————————————————————————————————
 function renderQuestionNumber() {
-    const questionNumber = document.getElementById('question-number');
-    questionNumber.textContent = `Frage: ${currentQuestionNumber}/${currentQuest.length}`;
+  const el = $id('question-number');
+  if (!el) return;
+  el.textContent = `Frage: ${Math.min(currentIndex + 1, currentQuest.length)}/${currentQuest.length || 0}`;
 }
 
 function renderDifficulty() {
-    const level = document.getElementById('level');
-    level.textContent = `Schwierigkeitsgrad : ${currentDifficulty}`
+  const el = $id('level');
+  if (!el) return;
+  el.textContent = `Schwierigkeitsgrad : ${currentDifficulty}`;
 }
 
 function renderQuestion() {
-    const quizQuestion = document.getElementById('quiz-question');
-    quizQuestion.textContent = `Frage: ${currentQuest[currentQuestionNumber].question}`;
+  const el = getQuestionEl();
+  const q  = currentQuest[currentIndex];
+  if (!el || !q) return;
+  el.textContent = `Frage: ${q.question}`;
 }
 
 function renderAnswers() {
-    const answer1 = document.getElementById('answer_1');
-    const answer2 = document.getElementById('answer_2');
-    const answer3 = document.getElementById('answer_3');
-    const answer4 = document.getElementById('answer_4');
-    answer1.textContent = `${currentQuest[currentQuestionNumber].answer_1}`;
-    answer2.textContent = `${currentQuest[currentQuestionNumber].answer_2}`;
-    answer3.textContent = `${currentQuest[currentQuestionNumber].answer_3}`;
-    answer4.textContent = `${currentQuest[currentQuestionNumber].answer_4}`;
+  const q = currentQuest[currentIndex];
+  if (!q) return;
 
+  const a1 = $id('answer_1');
+  const a2 = $id('answer_2');
+  const a3 = $id('answer_3');
+  const a4 = $id('answer_4');
 
+  if (a1) a1.textContent = q.answer_1 ?? '';
+  if (a2) a2.textContent = q.answer_2 ?? '';
+  if (a3) a3.textContent = q.answer_3 ?? '';
+  if (a4) a4.textContent = q.answer_4 ?? '';
 }
-// einbinden von rubric: html
-////////////////////////////////////////////////////////////////////////////////////
-// document.querySelector('.quiz-question').textContent = first.text;
-// document.querySelector('.quiz-answers').innerHTML = first.choices
-//   .map((txt, i) => `
-//     <div class="d-flex align-items-center mb-3">
-//       <div class="badge bg-secondary me-3">${'ABCD'[i]}</div>
-//       <button class="btn w-100 text-start btn-outline-primary">${txt}</button>
-//     </div>
-//   `)
-//   .join('');
 
+function updateNextBtnState() {
+  const btn = $id('next-btn');
+  if (!btn) return;
+  btn.disabled = currentIndex >= currentQuest.length - 1 || currentQuest.length === 0;
+}
 
-// kleiner Funktionstest, dass JS läuft:
-console.log('main.js geladen');
-init();
-// Beispiel: erste Frage einsetzen
-// const questionEl = document.querySelector('.quiz-question');
-// const answersEl  = document.querySelector('.quiz-answers');
+// ———————————————————————————————————————————————————————————————
+// Interaktionen
+// ———————————————————————————————————————————————————————————————
+function onNext() {
+  if (currentIndex < currentQuest.length - 1) {
+    currentIndex++;
+    renderQuestion();
+    renderAnswers();
+    renderQuestionNumber();
+    updateNextBtnState();
+  }
+}
 
-// if (questionEl && answersEl) {
-//   questionEl.textContent = 'Was ist 2 + 2?';
-//   ['3','4','5'].forEach((txt,i)=>{
-//     const b=document.createElement('button');
-//     b.className='btn btn-outline-primary d-block mb-2';
-//     b.textContent=txt;
-//     b.onclick=()=>alert(i===1?'Richtig ✅':'Falsch ❌');
-//     answersEl.appendChild(b);
-//   });
-// }
+// ———————————————————————————————————————————————————————————————
+// Init (HMR-sicher: kein Doppelstart, sauberes Aufräumen)
+// ———————————————————————————————————————————————————————————————
+let booted = false;
+
+function init() {
+  if (booted) return;      // schützt vor Doppelstart (z. B. durch HMR)
+  booted = true;
+
+  // DOM vorhanden?
+  if (!getQuestionEl()) {
+    console.warn('[quiz] init abgebrochen: #quiz-question fehlt (Timing/HMR?)');
+    booted = false;
+    return;
+  }
+
+  // Events binden
+  const next = $id('next-btn');
+  if (next) next.addEventListener('click', onNext);
+
+  // Erste Ansicht
+  renderQuestion();
+  renderAnswers();
+  renderQuestionNumber();
+  renderDifficulty();
+  updateNextBtnState();
+
+  console.log('main.js geladen');
+}
+
+// sicherer Start (einmalig)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init, { once: true });
+} else {
+  queueMicrotask(init);
+}
+
+// ———————————————————————————————————————————————————————————————
+// Vite HMR: sauber entsorgen & neu rendern
+// ———————————————————————————————————————————————————————————————
+if (import.meta.hot) {
+  // Beim Ersetzen dieses Moduls: Listener lösen & Neu-Init erlauben
+  import.meta.hot.dispose(() => {
+    const next = $id('next-btn');
+    if (next) {
+      // Trick: Knoten ersetzen => alle Listener weg
+      next.replaceWith(next.cloneNode(true));
+    }
+    booted = false; // beim nächsten Tick neu initialisieren
+  });
+
+  // Nach dem Hot-Swap neu rendern (oder notfalls neu initialisieren)
+  import.meta.hot.accept(() => {
+    try {
+      renderQuestion();
+      renderAnswers();
+      renderQuestionNumber();
+      renderDifficulty();
+      updateNextBtnState();
+    } catch (e) {
+      console.warn('[HMR] re-render failed → re-init', e);
+      queueMicrotask(init);
+    }
+  });
+}
