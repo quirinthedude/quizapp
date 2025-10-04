@@ -18,6 +18,9 @@ console.info('Using script:', import.meta.url);
 let currentDifficulty = 'hard';   //  'easy' | 'medium' | 'hard' 
 let currentRubric     = 'HTML';   // 'HTML' | 'CSS' | 'JS' | 'JSON'
 let currentIndex      = 0;        // 0-basiert!
+let questionAnswered = false;
+let redFlag = '';
+let greenflag = '';
 
 // Fragen-Pool aufbereiten (max. 10)
 const currentQuest =
@@ -93,6 +96,10 @@ function updateNextBtnState() {
 // Interaktionen
 // ———————————————————————————————————————————————————————————————
 function onNext() {
+  if (!questionAnswered) return;
+  questionAnswered = false;
+  if (redFlag) redFlag.classList.remove('bg-danger');
+  if (greenflag) greenflag.classList.remove('bg-success');
   if (currentIndex < currentQuest.length - 1) {
     currentIndex++;
     renderQuestion();
@@ -100,6 +107,26 @@ function onNext() {
     renderQuestionNumber();
     updateNextBtnState();
   }
+}
+
+function checkAnswer(answerNumber) {
+  console.log(answerNumber);
+  const indexAnswer = (answerNumber.slice(-1));
+  const rightAnswerIndex = currentQuest[currentIndex].right_answer;
+  const rightAnswerID = document.getElementById(`answer_${rightAnswerIndex}`).parentNode;
+  
+  questionAnswered = true;
+  greenflag = rightAnswerID;
+  rightAnswerID.classList.add('bg-success');
+  
+  if(rightAnswerIndex == indexAnswer) {
+    currentQuest[currentIndex].answered = true;
+  } else {
+    currentQuest[currentIndex].answered = false;
+    redFlag = document.getElementById(answerNumber).parentNode
+    redFlag.classList.add('bg-danger');
+  }
+  document.getElementById('next-btn').disabled = false;
 }
 
 // ———————————————————————————————————————————————————————————————
@@ -167,3 +194,4 @@ if (import.meta.hot) {
     }
   });
 }
+window.checkAnswer = checkAnswer;  // macht die Funktion fürs HTML global sichtbar

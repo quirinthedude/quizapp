@@ -35,22 +35,22 @@
       <div class="card">
       <h2 id="quiz-question">Frage wird hier erscheinen</h2>
       <div id="quiz-answers">
-        <div class="card mb-2">
-          <div id="answer_1" class="card-body">
+        <div class="card mb-2" onclick="checkAnswer('answer_1')">
+          <div id="answer_1" class="card-body" >
             Antwort
           </div>
         </div>
-        <div class="card mb-2">
+        <div class="card mb-2" onclick="checkAnswer('answer_2')">
           <div id="answer_2" class="card-body">
             Antwort
           </div>
         </div>
-        <div class="card mb-2">
+        <div class="card mb-2" onclick="checkAnswer('answer_3')">
           <div id="answer_3" class="card-body">
             Antwort
           </div>
         </div>
-        <div class="card">
+        <div class="card" onclick="checkAnswer('answer_4')">
           <div id="answer_4" class="card-body">
             Antwort
           </div>
@@ -61,7 +61,7 @@
         <div class="d-flex justify-content-between align-items-stretch
          mt-3 p-3 border-top bg-body-tertiary rounded-bottom card-footer text-body-secondary">
 
-        <button id="next-btn" class="btn btn-primary">Nächste Frage</button>
+        <button id="next-btn" disabled class="btn btn-primary">Nächste Frage</button>
 
         <div class="card-footer text-body-secondary ms-auto d-flex flex-column align-items-end gap-1 text-end">
           <span id="question-number">Frage: 1/10</span>

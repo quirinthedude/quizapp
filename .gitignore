@@ -26,3 +26,6 @@ node_modules/
 dist/
 .vscode/
 .DS_Store
+
+# eigene Dateien und Dokumentationen
+tree.txt
