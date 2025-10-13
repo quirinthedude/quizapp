@@ -15,8 +15,8 @@ console.info('Using script:', import.meta.url);
 // ———————————————————————————————————————————————————————————————
 // Zustand (State)
 // ———————————————————————————————————————————————————————————————
-let currentDifficulty = 'hard';   //  'easy' | 'medium' | 'hard' 
-let currentRubric     = 'HTML';   // 'HTML' | 'CSS' | 'JS' | 'JSON'
+let currentDifficulty = 'easy';   //  'easy' | 'medium' | 'hard' 
+let currentRubric;   // 'HTML' | 'CSS' | 'JS' | 'JSON'
 let currentIndex      = 0;        // 0-basiert!
 let questionAnswered = false;
 let redFlag = '';
@@ -91,6 +91,48 @@ function updateNextBtnState() {
   if (!btn) return;
   btn.disabled = currentIndex >= currentQuest.length - 1 || currentQuest.length === 0;
 }
+// ———————————————————————————————————————————————————————————————
+// Startseite
+// ———————————————————————————————————————————————————————————————
+function chooseCSS() {
+  const HTML = $id('HTML');
+  const CSS = $id('CSS');
+  const JS = $id('JS');
+  currentRubric = 'CSS';
+  HTML.classList.remove('active');
+  HTML.setAttribute('onclick', "chooseHTML()");
+  JS.classList.remove('active');
+  JS.setAttribute('onclick', "chooseJS()");
+  CSS.classList.add('active');
+  CSS.removeAttribute('onclick');
+};
+
+function chooseJS() {
+  const HTML = $id('HTML');
+  const CSS = $id('CSS');
+  const JS = $id('JS');
+  currentRubric = 'JS';
+  HTML.classList.remove('active');
+  HTML.setAttribute('onclick', "chooseHTML()");
+  CSS.classList.remove('active');
+  CSS.setAttribute('onclick', "chooseCSS()");
+  JS.classList.add('active');
+  JS.removeAttribute('onclick');
+};
+
+function chooseHTML() {
+  const HTML = $id('HTML');
+  const CSS = $id('CSS');
+  const JS = $id('JS');
+  currentRubric = 'HTML';
+  CSS.classList.remove('active');
+  CSS.setAttribute('onclick', "chooseCSS()");
+  JS.classList.remove('active');
+  JS.setAttribute('onclick', "chooseJS()");
+  HTML.classList.add('active');
+  HTML.removeAttribute('onclick');
+};
+
 
 // ———————————————————————————————————————————————————————————————
 // Interaktionen
@@ -195,3 +237,6 @@ if (import.meta.hot) {
   });
 }
 window.checkAnswer = checkAnswer;  // macht die Funktion fürs HTML global sichtbar
+window.chooseCSS = chooseCSS;
+window.chooseHTML = chooseHTML;
+window.chooseJS = chooseJS;

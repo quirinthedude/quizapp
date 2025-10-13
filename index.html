@@ -4,6 +4,10 @@
 <head>
   <meta charset="UTF-8" />
   <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:ital,wght@0,300..900;1,300..900&display=swap"
+    rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>quizapp</title>
   <!-- <link rel="stylesheet" href="./src/style.css"> -->
@@ -32,41 +36,27 @@
 
   <!-- Abstand unter fixed Navbar -->
   <main class="container" style="padding-top:80px">
-      <div class="card">
-      <h2 id="quiz-question">Frage wird hier erscheinen</h2>
-      <div id="quiz-answers">
-        <div class="card mb-2" onclick="checkAnswer('answer_1')">
-          <div id="answer_1" class="card-body" >
-            Antwort
-          </div>
-        </div>
-        <div class="card mb-2" onclick="checkAnswer('answer_2')">
-          <div id="answer_2" class="card-body">
-            Antwort
-          </div>
-        </div>
-        <div class="card mb-2" onclick="checkAnswer('answer_3')">
-          <div id="answer_3" class="card-body">
-            Antwort
-          </div>
-        </div>
-        <div class="card" onclick="checkAnswer('answer_4')">
-          <div id="answer_4" class="card-body">
-            Antwort
-          </div>
-        </div>
+    <div class="card text-center">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a id="HTML" class="nav-link active" aria-current="true">HTML</a>
+          </li>
+          <li class="nav-item">
+            <button id="CSS" class="nav-link" onclick="chooseCSS()">CSS</button>
+          </li>
+          <li class="nav-item">
+            <button id="JS" class="nav-link" onclick="chooseJS()">Javascript</button>
+          </li>
+        </ul>
       </div>
-
-      <!-- <div class="d-flex align-items-stretch"> -->
-        <div class="d-flex justify-content-between align-items-stretch
-         mt-3 p-3 border-top bg-body-tertiary rounded-bottom card-footer text-body-secondary">
-
-        <button id="next-btn" disabled class="btn btn-primary">Nächste Frage</button>
-
-        <div class="card-footer text-body-secondary ms-auto d-flex flex-column align-items-end gap-1 text-end">
-          <span id="question-number">Frage: 1/10</span>
-          <span id="level">Schwierigkeitsgrad: einfach</span>
-        </div>
+      <div class="card-body welcome">
+        <h2 class="card-title">Willkommen bei unserem HTML/CSS/Javascript - Quiz</h2>
+        <p class="card-text">Es gibt bisher 3 Kategorien und 3 Schwierigkeitsgrade</p>
+        <p class="card-text">Die Kategorien sind frei wählbar. Sobald Du mit dem Quiz angefangen hast, nur noch,
+          indem Du das Quiz von vorne startest. </p>
+          <p id="INDEX-CONTENT"></p>
+          <a href="game.html" class="btn btn-primary">Quiz Starten</a>
       </div>
     </div>
   </main>
