@@ -25,9 +25,6 @@ a {
   color: #646cff;
   text-decoration: inherit;
 }
-a:hover {
-  color: #535bf2;
-}
 
 body {
   margin: 0;
@@ -101,6 +98,11 @@ button:focus-visible {
   outline: 4px auto -webkit-focus-ring-color;
 }
 
+.nav-tabs .nav-link { 
+  cursor: pointer; 
+  border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
@@ -108,6 +110,7 @@ button:focus-visible {
   }
   a:hover {
     color: #747bff;
+    cursor: pointer !important;
   }
   button {
     background-color: #f9f9f9;

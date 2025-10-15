@@ -9,6 +9,7 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import './style.css';
 import { QUIZ } from './data/quiz.js';
+import { RUBRICTEXT } from './data/content.js';
 
 console.info('Using script:', import.meta.url);
 
@@ -105,6 +106,7 @@ function chooseCSS() {
   JS.setAttribute('onclick', "chooseJS()");
   CSS.classList.add('active');
   CSS.removeAttribute('onclick');
+  renderRubric(1);
 };
 
 function chooseJS() {
@@ -118,6 +120,7 @@ function chooseJS() {
   CSS.setAttribute('onclick', "chooseCSS()");
   JS.classList.add('active');
   JS.removeAttribute('onclick');
+  renderRubric(2);
 };
 
 function chooseHTML() {
@@ -131,8 +134,13 @@ function chooseHTML() {
   JS.setAttribute('onclick', "chooseJS()");
   HTML.classList.add('active');
   HTML.removeAttribute('onclick');
+  renderRubric(0);
 };
 
+function renderRubric(rubricIndex) {
+  const QUIZRUBRIC = $id('INDEX-CONTENT');
+  QUIZRUBRIC.innerHTML = RUBRICTEXT[rubricIndex];
+}
 
 // ———————————————————————————————————————————————————————————————
 // Interaktionen

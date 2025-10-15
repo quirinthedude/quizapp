@@ -23,11 +23,11 @@
           <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="mainNav">
+        <!-- <div class="collapse navbar-collapse" id="mainNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item"><a class="nav-link active" href="#">Start</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Scores</a></li>
-            <li class="nav-item"><a class="nav-link" href="#">Einstellungen</a></li>
+            <li class="nav-item"><a class="nav-link" href="#">Scores</a></li> 
+            <li class="nav-item"><a class="nav-link" href="#">Einstellungen</a></li> -->
           </ul>
         </div>
       </div>
@@ -37,16 +37,16 @@
   <!-- Abstand unter fixed Navbar -->
   <main class="container" style="padding-top:80px">
     <div class="card text-center">
-      <div class="card-header">
-        <ul class="nav nav-tabs card-header-tabs">
+      <div class="card-header" role="tabpanel">
+        <ul class="nav nav-tabs card-header-tabs" role="tablist">
           <li class="nav-item">
-            <a id="HTML" class="nav-link active" aria-current="true">HTML</a>
+            <button id="HTML" class="nav-link active" role="tab">HTML</button>
           </li>
           <li class="nav-item">
-            <button id="CSS" class="nav-link" onclick="chooseCSS()">CSS</button>
+            <button id="CSS" class="nav-link" onclick="chooseCSS()" role="tab">CSS</button>
           </li>
           <li class="nav-item">
-            <button id="JS" class="nav-link" onclick="chooseJS()">Javascript</button>
+            <button id="JS" class="nav-link" onclick="chooseJS()" role="tab">Javascript</button>
           </li>
         </ul>
       </div>
@@ -55,7 +55,7 @@
         <p class="card-text">Es gibt bisher 3 Kategorien und 3 Schwierigkeitsgrade</p>
         <p class="card-text">Die Kategorien sind frei wählbar. Sobald Du mit dem Quiz angefangen hast, nur noch,
           indem Du das Quiz von vorne startest. </p>
-          <p id="INDEX-CONTENT"></p>
+          <div id="INDEX-CONTENT"></div>
           <a href="game.html" class="btn btn-primary">Quiz Starten</a>
       </div>
     </div>
