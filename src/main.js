@@ -9,7 +9,6 @@ import 'bootstrap-icons/font/bootstrap-icons.css';
 
 import './style.css';
 import { QUIZ } from './data/quiz.js';
-import { RUBRICTEXT } from './data/content.js';
 
 console.info('Using script:', import.meta.url);
 
@@ -17,8 +16,11 @@ console.info('Using script:', import.meta.url);
 // Zustand (State)
 // ———————————————————————————————————————————————————————————————
 let currentDifficulty = 'easy';   //  'easy' | 'medium' | 'hard' 
-let currentRubric;   // 'HTML' | 'CSS' | 'JS' | 'JSON'
-let currentIndex      = 0;        // 0-basiert!
+// let currentRubric = localStorage.getItem('quiz.rubric');
+let currentIndex = 0;
+let currentRubric = new URLSearchParams(location.search).get('rubric')
+  || localStorage.getItem('quiz.rubric');
+
 let questionAnswered = false;
 let redFlag = '';
 let greenflag = '';
@@ -29,21 +31,22 @@ const currentQuest =
     .filter(q => q.difficulty === currentDifficulty)
     .slice(0, 10)
     .map(q => ({
-      question:     q.text,
-      answer_1:     q.choices?.[0] ?? '',
-      answer_2:     q.choices?.[1] ?? '',
-      answer_3:     q.choices?.[2] ?? '',
-      answer_4:     q.choices?.[3] ?? '',
+      question: q.text,
+      answer_1: q.choices?.[0] ?? '',
+      answer_2: q.choices?.[1] ?? '',
+      answer_3: q.choices?.[2] ?? '',
+      answer_4: q.choices?.[3] ?? '',
       right_answer: (q.correctIndex ?? 0) + 1,
-      answered:     false,
+      answered: false,
     }));
 
 // Debug in der Konsole nutzbar machen (weil ES-Module nicht global sind)
-window.__Q = { currentQuest, get index(){return currentIndex;} };
+window.__Q = { currentQuest, get index() { return currentIndex; } };
 
 // ———————————————————————————————————————————————————————————————
 // DOM-Helpers
 // ———————————————————————————————————————————————————————————————
+
 const $id = (id) => document.getElementById(id);
 
 // Fragelement: erlaubt id ODER class 
@@ -67,7 +70,7 @@ function renderDifficulty() {
 
 function renderQuestion() {
   const el = getQuestionEl();
-  const q  = currentQuest[currentIndex];
+  const q = currentQuest[currentIndex];
   if (!el || !q) return;
   el.textContent = `Frage: ${q.question}`;
 }
@@ -92,55 +95,6 @@ function updateNextBtnState() {
   if (!btn) return;
   btn.disabled = currentIndex >= currentQuest.length - 1 || currentQuest.length === 0;
 }
-// ———————————————————————————————————————————————————————————————
-// Startseite
-// ———————————————————————————————————————————————————————————————
-function chooseCSS() {
-  const HTML = $id('HTML');
-  const CSS = $id('CSS');
-  const JS = $id('JS');
-  currentRubric = 'CSS';
-  HTML.classList.remove('active');
-  HTML.setAttribute('onclick', "chooseHTML()");
-  JS.classList.remove('active');
-  JS.setAttribute('onclick', "chooseJS()");
-  CSS.classList.add('active');
-  CSS.removeAttribute('onclick');
-  renderRubric(1);
-};
-
-function chooseJS() {
-  const HTML = $id('HTML');
-  const CSS = $id('CSS');
-  const JS = $id('JS');
-  currentRubric = 'JS';
-  HTML.classList.remove('active');
-  HTML.setAttribute('onclick', "chooseHTML()");
-  CSS.classList.remove('active');
-  CSS.setAttribute('onclick', "chooseCSS()");
-  JS.classList.add('active');
-  JS.removeAttribute('onclick');
-  renderRubric(2);
-};
-
-function chooseHTML() {
-  const HTML = $id('HTML');
-  const CSS = $id('CSS');
-  const JS = $id('JS');
-  currentRubric = 'HTML';
-  CSS.classList.remove('active');
-  CSS.setAttribute('onclick', "chooseCSS()");
-  JS.classList.remove('active');
-  JS.setAttribute('onclick', "chooseJS()");
-  HTML.classList.add('active');
-  HTML.removeAttribute('onclick');
-  renderRubric(0);
-};
-
-function renderRubric(rubricIndex) {
-  const QUIZRUBRIC = $id('INDEX-CONTENT');
-  QUIZRUBRIC.innerHTML = RUBRICTEXT[rubricIndex];
-}
 
 // ———————————————————————————————————————————————————————————————
 // Interaktionen
@@ -164,12 +118,12 @@ function checkAnswer(answerNumber) {
   const indexAnswer = (answerNumber.slice(-1));
   const rightAnswerIndex = currentQuest[currentIndex].right_answer;
   const rightAnswerID = document.getElementById(`answer_${rightAnswerIndex}`).parentNode;
-  
+
   questionAnswered = true;
   greenflag = rightAnswerID;
   rightAnswerID.classList.add('bg-success');
-  
-  if(rightAnswerIndex == indexAnswer) {
+
+  if (rightAnswerIndex == indexAnswer) {
     currentQuest[currentIndex].answered = true;
   } else {
     currentQuest[currentIndex].answered = false;
@@ -187,6 +141,7 @@ let booted = false;
 function init() {
   if (booted) return;      // schützt vor Doppelstart (z. B. durch HMR)
   booted = true;
+  console.log(currentRubric);
 
   // DOM vorhanden?
   if (!getQuestionEl()) {
@@ -245,6 +200,3 @@ if (import.meta.hot) {
   });
 }
 window.checkAnswer = checkAnswer;  // macht die Funktion fürs HTML global sichtbar
-window.chooseCSS = chooseCSS;
-window.chooseHTML = chooseHTML;
-window.chooseJS = chooseJS;
