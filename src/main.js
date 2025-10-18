@@ -24,6 +24,7 @@ let currentRubric = new URLSearchParams(location.search).get('rubric')
 let questionAnswered = false;
 let redFlag = '';
 let greenflag = '';
+let score = 0;
 
 // Fragen-Pool aufbereiten (max. 10)
 const currentQuest =
@@ -43,6 +44,7 @@ const currentQuest =
 // Debug in der Konsole nutzbar machen (weil ES-Module nicht global sind)
 window.__Q = { currentQuest, get index() { return currentIndex; } };
 
+
 // ———————————————————————————————————————————————————————————————
 // DOM-Helpers
 // ———————————————————————————————————————————————————————————————
@@ -60,6 +62,12 @@ function renderQuestionNumber() {
   const el = $id('question-number');
   if (!el) return;
   el.textContent = `Frage: ${Math.min(currentIndex + 1, currentQuest.length)}/${currentQuest.length || 0}`;
+}
+
+function renderScore() {
+  const SCORE = $id('scores');
+  SCORE.innerHTML = `<h2>Score: ${score}/10`
+
 }
 
 function renderDifficulty() {
@@ -109,6 +117,7 @@ function onNext() {
     renderQuestion();
     renderAnswers();
     renderQuestionNumber();
+    renderScore();
     updateNextBtnState();
   }
 }
@@ -125,6 +134,7 @@ function checkAnswer(answerNumber) {
 
   if (rightAnswerIndex == indexAnswer) {
     currentQuest[currentIndex].answered = true;
+    score++;
   } else {
     currentQuest[currentIndex].answered = false;
     redFlag = document.getElementById(answerNumber).parentNode
@@ -159,6 +169,7 @@ function init() {
   renderAnswers();
   renderQuestionNumber();
   renderDifficulty();
+  renderScore();
   updateNextBtnState();
 
   console.log('main.js geladen');

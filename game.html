@@ -58,12 +58,14 @@
       </div>
 
       <!-- <div class="d-flex align-items-stretch"> -->
-        <div class="d-flex justify-content-between align-items-stretch
+        <div class="d-flex justify-content-between align-items-stretch row
          mt-3 p-3 border-top bg-body-tertiary rounded-bottom card-footer text-body-secondary">
 
-        <button id="next-btn" disabled class="btn btn-primary">Nächste Frage</button>
-
-        <div class="card-footer text-body-secondary ms-auto d-flex flex-column align-items-end gap-1 text-end">
+        <button id="next-btn" disabled class="col btn btn-primary">Nächste Frage</button>
+        <div id="scores" class="card-footer col text-center">
+          <h2>Scores 0/10</h2>
+        </div>
+        <div class="card-footer col text-body-secondary ms-auto d-flex flex-column align-items-end gap-1 text-end">
           <span id="question-number">Frage: 1/10</span>
           <span id="level">Schwierigkeitsgrad: einfach</span>
         </div>

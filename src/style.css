@@ -102,12 +102,22 @@ button:focus-visible {
   cursor: pointer; 
   border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
 
+.bg-success {
+  color: white;
+  font-weight: bold;
+}
+
+.bg-danger {
+  color: white;
+  font-weight: bold;
+}
 
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
     background-color: #ffffff;
   }
+
   a:hover {
     color: #747bff;
     cursor: pointer !important;
