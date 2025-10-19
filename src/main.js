@@ -66,7 +66,7 @@ function renderQuestionNumber() {
 
 function renderScore() {
   const SCORE = $id('scores');
-  SCORE.innerHTML = `<h2>Score: ${score}/10`
+  SCORE.innerHTML = `<h2>Score: ${score}/10</h2>`
 
 }
 
@@ -104,6 +104,42 @@ function updateNextBtnState() {
   btn.disabled = currentIndex >= currentQuest.length - 1 || currentQuest.length === 0;
 }
 
+function lightbox() {
+  const LIGHTBOX = $id('lightbox');
+  if (!LIGHTBOX) return;
+  if (LIGHTBOX.open) LIGHTBOX.close();
+  LIGHTBOX.showModal();
+
+  $id('result').textContent = `${score}/10`;
+  $id('difficulty').textContent = `${currentDifficulty}`;
+  if (currentDifficulty == 'easy') {
+    currentDifficulty = 'medium';
+  } else if (currentDifficulty == 'medium') {
+    currentDifficulty = 'hard';
+  } else if (currentDifficulty == 'hard') {
+    endOfGame();
+    return;
+  }
+  score = 0;
+  currentIndex = 0;
+  $id('result-btn').setAttribute('onclick', "closeLightbox()")
+}
+
+function endOfGame() {
+  $id('end-of-game').innerHTML = `<h4>Das Ende des Quiz ist erreicht!</h4>
+<p>Klicke Start, um zur Auswahl zu kommen</p>`;
+
+  const NEWSTART = $id('result-btn');
+  if (!NEWSTART) return;
+
+  const link = document.createElement('a'); // neuer Link
+  link.id = 'result-btn';
+  link.className = NEWSTART.className // behält das bootstrap-style
+  link.textContent = 'Start';
+  link.href = 'index.html';
+  NEWSTART.replaceWith(link);
+}
+
 // ———————————————————————————————————————————————————————————————
 // Interaktionen
 // ———————————————————————————————————————————————————————————————
@@ -132,6 +168,9 @@ function checkAnswer(answerNumber) {
   greenflag = rightAnswerID;
   rightAnswerID.classList.add('bg-success');
 
+  const total = currentQuest.length;
+  if (currentIndex >= total - 1) lightbox();
+
   if (rightAnswerIndex == indexAnswer) {
     currentQuest[currentIndex].answered = true;
     score++;
@@ -143,6 +182,10 @@ function checkAnswer(answerNumber) {
   document.getElementById('next-btn').disabled = false;
 }
 
+function closeLightbox() {
+  $id('lightbox')?.close();
+  init();
+}
 // ———————————————————————————————————————————————————————————————
 // Init (HMR-sicher: kein Doppelstart, sauberes Aufräumen)
 // ———————————————————————————————————————————————————————————————
@@ -211,3 +254,4 @@ if (import.meta.hot) {
   });
 }
 window.checkAnswer = checkAnswer;  // macht die Funktion fürs HTML global sichtbar
+window.closeLightbox = closeLightbox;

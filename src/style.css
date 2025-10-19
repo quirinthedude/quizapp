@@ -112,6 +112,12 @@ button:focus-visible {
   font-weight: bold;
 }
 
+#completed {
+  display: flex;
+  justify-content: space-between;
+  gap: 5%;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
