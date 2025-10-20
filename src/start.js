@@ -30,6 +30,7 @@ function chooseCSS() {
     const JS = $id('JS');
     currentRubric = 'CSS';
     localStorage.setItem('quiz.rubric', 'CSS');
+    localStorage.setItem('quiz.level', 'easy'); // oder gewählte Stufe
     const startBtn = document.querySelector('.btn.btn-primary');
     if (startBtn) startBtn.href = `game.html?rubric=${currentRubric}&level=easy`;
     HTML.classList.remove('active');
@@ -47,6 +48,7 @@ function chooseJS() {
     const JS = $id('JS');
     currentRubric = 'JS';
     localStorage.setItem('quiz.rubric', 'JS');
+    localStorage.setItem('quiz.level', 'easy'); // oder gewählte Stufe
     const startBtn = document.querySelector('.btn.btn-primary');
     if (startBtn) startBtn.href = `game.html?rubric=${currentRubric}&level=easy`;
     HTML.classList.remove('active');
@@ -64,6 +66,7 @@ function chooseHTML() {
     const JS = $id('JS');
     currentRubric = 'HTML';
     localStorage.setItem('quiz.rubric', 'HTML');
+    localStorage.setItem('quiz.level', 'easy'); // oder gewählte Stufe
     const startBtn = document.querySelector('.btn.btn-primary');
     if (startBtn) startBtn.href = `game.html?rubric=${currentRubric}&level=easy`;
     CSS.classList.remove('active');

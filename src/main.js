@@ -26,10 +26,14 @@ let redFlag = '';
 let greenflag = '';
 let score = 0;
 
-// Fragen-Pool aufbereiten (max. 10)
-const currentQuest =
-  (QUIZ.find(r => r.rubric === currentRubric)?.questions || [])
-    .filter(q => q.difficulty === currentDifficulty)
+// Fragen-Pool aufbereiten (max. 10)// oben
+let currentQuest = [];
+
+// pure Funktion: keine Globals anfassen
+function buildQuest(rubric, difficulty) {
+  const questions = QUIZ.find(r => r.rubric === rubric)?.questions || [];
+  return questions
+    .filter(q => q.difficulty === difficulty)
     .slice(0, 10)
     .map(q => ({
       question: q.text,
@@ -40,6 +44,8 @@ const currentQuest =
       right_answer: (q.correctIndex ?? 0) + 1,
       answered: false,
     }));
+}
+
 
 // Debug in der Konsole nutzbar machen (weil ES-Module nicht global sind)
 window.__Q = { currentQuest, get index() { return currentIndex; } };
@@ -112,32 +118,44 @@ function lightbox() {
 
   $id('result').textContent = `${score}/10`;
   $id('difficulty').textContent = `${currentDifficulty}`;
-  if (currentDifficulty == 'easy') {
-    currentDifficulty = 'medium';
-  } else if (currentDifficulty == 'medium') {
-    currentDifficulty = 'hard';
-  } else if (currentDifficulty == 'hard') {
-    endOfGame();
-    return;
-  }
-  score = 0;
-  currentIndex = 0;
-  $id('result-btn').setAttribute('onclick', "closeLightbox()")
-}
 
-function endOfGame() {
-  $id('end-of-game').innerHTML = `<h4>Das Ende des Quiz ist erreicht!</h4>
-<p>Klicke Start, um zur Auswahl zu kommen</p>`;
+  // — NEU: Weiter-Button per JS anbinden —
+  const btn = $id('result-btn');
+  if (!btn) return;
 
-  const NEWSTART = $id('result-btn');
-  if (!NEWSTART) return;
+  btn.onclick = null; /*alte listener aus*/
 
-  const link = document.createElement('a'); // neuer Link
-  link.id = 'result-btn';
-  link.className = NEWSTART.className // behält das bootstrap-style
-  link.textContent = 'Start';
-  link.href = 'index.html';
-  NEWSTART.replaceWith(link);
+  if (btn) btn.onclick = (e) => {
+    // Schnappschuss, damit nichts "durchrutscht"
+    const prev = currentDifficulty;
+
+    if (prev === 'hard') {
+      endOfGame();
+      return;
+    }
+    if (prev === 'medium') {
+      currentDifficulty = 'hard';
+    } else if (prev === 'easy') {
+      currentDifficulty = 'medium';
+    }
+    localStorage.setItem('quiz.level', currentDifficulty); /*gleich sichern*/
+    localStorage.setItem('quiz.rubric', currentRubric);
+
+    // Reset für nächste Runde
+    score = 0;
+    currentIndex = 0;
+    currentQuest = buildQuest(currentRubric, currentDifficulty);
+
+    // UI aktualisieren (kurz & sicher)
+    renderDifficulty();
+    renderQuestionNumber();
+    renderScore();
+    renderQuestion();
+    renderAnswers();
+    updateNextBtnState();
+
+    closeLightbox(); // dialog zu
+  };
 }
 
 // ———————————————————————————————————————————————————————————————
@@ -145,6 +163,9 @@ function endOfGame() {
 // ———————————————————————————————————————————————————————————————
 function onNext() {
   if (!questionAnswered) return;
+  const total = currentQuest.length;
+  if (currentIndex >= total - 1) lightbox();
+
   questionAnswered = false;
   if (redFlag) redFlag.classList.remove('bg-danger');
   if (greenflag) greenflag.classList.remove('bg-success');
@@ -168,8 +189,6 @@ function checkAnswer(answerNumber) {
   greenflag = rightAnswerID;
   rightAnswerID.classList.add('bg-success');
 
-  const total = currentQuest.length;
-  if (currentIndex >= total - 1) lightbox();
 
   if (rightAnswerIndex == indexAnswer) {
     currentQuest[currentIndex].answered = true;
@@ -184,39 +203,76 @@ function checkAnswer(answerNumber) {
 
 function closeLightbox() {
   $id('lightbox')?.close();
-  init();
 }
 // ———————————————————————————————————————————————————————————————
 // Init (HMR-sicher: kein Doppelstart, sauberes Aufräumen)
 // ———————————————————————————————————————————————————————————————
 let booted = false;
 
+// function init() {
+//   if (booted) return;      // schützt vor Doppelstart (z. B. durch HMR)
+//   booted = true;
+//   console.log(currentRubric);
+
+//   // DOM vorhanden?
+//   if (!getQuestionEl()) {
+//     console.warn('[quiz] init abgebrochen: #quiz-question fehlt (Timing/HMR?)');
+//     booted = false;
+//     return;
+//   }
+
+//   // Events binden
+//   const next = $id('next-btn');
+//   if (next) next.addEventListener('click', onNext);
+
+//   // Erste Ansicht
+//   renderQuestion();
+//   renderAnswers();
+//   renderQuestionNumber();
+//   renderDifficulty();
+//   renderScore();
+//   updateNextBtnState();
+
+//   console.log('main.js geladen');
+// }
+
 function init() {
-  if (booted) return;      // schützt vor Doppelstart (z. B. durch HMR)
-  booted = true;
-  console.log(currentRubric);
+  // 1) Quellen: localStorage > URL > Defaults
+  const qs = new URLSearchParams(location.search);
 
-  // DOM vorhanden?
-  if (!getQuestionEl()) {
-    console.warn('[quiz] init abgebrochen: #quiz-question fehlt (Timing/HMR?)');
-    booted = false;
-    return;
-  }
+  currentRubric = localStorage.getItem('quiz.rubric') || qs.get('rubric') || 'HTML';
+  currentDifficulty = localStorage.getItem('quiz.level') || qs.get('level') || 'easy';
 
-  // Events binden
-  const next = $id('next-btn');
-  if (next) next.addEventListener('click', onNext);
+  // 2) Normalisieren + Validieren
+  currentRubric = String(currentRubric).trim();
+  currentDifficulty = String(currentDifficulty).toLowerCase().trim();
 
-  // Erste Ansicht
+  const VALID_LEVELS = ['easy', 'medium', 'hard'];
+  if (!VALID_LEVELS.includes(currentDifficulty)) currentDifficulty = 'easy';
+
+  // 3) Persistieren (damit Folge-Starts ohne URL sauber sind)
+  localStorage.setItem('quiz.rubric', currentRubric);
+  localStorage.setItem('quiz.level', currentDifficulty);
+
+  // 4) Startzustand
+  currentIndex = 0;
+  score = 0;
+
+  // 5) Fragenliste passend zu Rubric/Level aufbauen (pure function)
+  currentQuest = buildQuest(currentRubric, currentDifficulty);
+
+  // 6) Minimal-Render
+  renderDifficulty();
+  renderQuestionNumber();
+  renderScore();
   renderQuestion();
   renderAnswers();
-  renderQuestionNumber();
-  renderDifficulty();
-  renderScore();
   updateNextBtnState();
-
-  console.log('main.js geladen');
 }
+
+// next-btn binden
+const next = $id('next-btn');
+if (next) next.onclick = onNext;
 
 // sicherer Start (einmalig)
 if (document.readyState === 'loading') {
