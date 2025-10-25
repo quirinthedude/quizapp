@@ -86,4 +86,15 @@ function renderRubric(rubricIndex) {
 window.chooseCSS = chooseCSS;
 window.chooseHTML = chooseHTML;
 window.chooseJS = chooseJS;
+// Einmaliger Initial-Start, wenn das DOM bereit ist
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('quiz.rubric') || 'HTML';
+  if (saved === 'CSS') {
+    chooseCSS();
+  } else if (saved === 'JS') {
+    chooseJS();
+  } else {
+    chooseHTML(); // Default
+  }
+});
 

@@ -25,6 +25,22 @@ let questionAnswered = false;
 let redFlag = '';
 let greenflag = '';
 let score = 0;
+let scoreEasy = 0;
+let scoreMedium = 0;
+let scoreHard = 0;
+
+// sound-object
+// Erzeuge ein neues Audio-Objekt nach dem Bauplan Audio
+// und lade gleich die Datei hinein
+const sounds = {
+  clown: new Audio('/assets/sounds/clown.mp3'),
+  guitar: new Audio('/assets/sounds/guitar.wav'),
+  applause: new Audio('/assets/sounds/jubilee.mp3')
+};
+
+function playSound(name) {
+  sounds[name]?.play();
+}
 
 // Fragen-Pool aufbereiten (max. 10)// oben
 let currentQuest = [];
@@ -115,7 +131,10 @@ function lightbox() {
   if (!LIGHTBOX) return;
   if (LIGHTBOX.open) LIGHTBOX.close();
   LIGHTBOX.showModal();
+  $id('completed').style.visibility = "visible";
 
+
+  playSound('applause');
   $id('result').textContent = `${score}/10`;
   $id('difficulty').textContent = `${currentDifficulty}`;
 
@@ -130,12 +149,15 @@ function lightbox() {
     const prev = currentDifficulty;
 
     if (prev === 'hard') {
+      scoreHard = score;
       endOfGame();
       return;
     }
     if (prev === 'medium') {
+      scoreMedium = score;
       currentDifficulty = 'hard';
     } else if (prev === 'easy') {
+      scoreEasy = score;
       currentDifficulty = 'medium';
     }
     localStorage.setItem('quiz.level', currentDifficulty); /*gleich sichern*/
@@ -156,6 +178,18 @@ function lightbox() {
 
     closeLightbox(); // dialog zu
   };
+}
+
+function endOfGame() {
+  playSound('applause');
+
+  $id('completed').style.visibility = "none";
+  $id('end-of-game').style.display = "block";
+
+  $id('rubric').textContent = `${currentRubric}`;
+  $id('score-easy').textContent = `${scoreEasy}`;
+  $id('score-medium').textContent = `${scoreMedium}`;
+  $id('score-hard').textContent = `${scoreHard}`;
 }
 
 // ———————————————————————————————————————————————————————————————
@@ -191,9 +225,11 @@ function checkAnswer(answerNumber) {
 
 
   if (rightAnswerIndex == indexAnswer) {
+    playSound('guitar');
     currentQuest[currentIndex].answered = true;
     score++;
   } else {
+    playSound('clown');
     currentQuest[currentIndex].answered = false;
     redFlag = document.getElementById(answerNumber).parentNode
     redFlag.classList.add('bg-danger');
